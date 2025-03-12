@@ -38,6 +38,7 @@ if (!class_exists('Emargy_Elements')) {
     include_once EMARGY_ELEMENTS_PATH . 'includes/class-emargy-elements.php';
     include_once EMARGY_ELEMENTS_PATH . 'includes/ajax-handler.php';
     require_once EMARGY_ELEMENTS_PATH . 'includes/enhancements/enhancements.php'; // Load enhancements
+    require_once EMARGY_ELEMENTS_PATH . 'includes/animated-heading-integration.php';
 }
 
 /**

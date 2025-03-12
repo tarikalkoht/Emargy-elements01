@@ -1,25 +1,44 @@
 /**
- * Emargy Animated Heading Widget Styles
+ * Emargy Animated Heading Widget Styles - Enhanced Version
+ * 
+ * @since 2.1.0
  */
 
- .emargy-animated-heading-wrapper {
+/* Base Styles */
+.emargy-animated-heading-wrapper {
     overflow: hidden;
+    position: relative;
 }
 
 .emargy-animated-heading {
     line-height: 1.2;
     margin: 0;
+    display: inline-block;
+    width: 100%;
 }
 
 .emargy-animated-text {
     display: inline-block;
     min-width: 1em;
+    position: relative;
 }
 
-/* Typing animation cursor */
+/* Layout Styles */
+.emargy-heading-layout-block .emargy-animated-heading {
+    display: block;
+}
+
+.emargy-heading-layout-block .emargy-animated-text {
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+/* Typing Animation Cursor */
 .typed-cursor {
     opacity: 1;
     animation: blink 0.7s infinite;
+    font-weight: inherit;
 }
 
 @keyframes blink {
@@ -28,52 +47,134 @@
     100% { opacity: 1; }
 }
 
-/* Fade animation */
-.emargy-animation-fade.emargy-animation-exit {
+/* Fade Animation */
+.emargy-animation-type-fade .emargy-animation-exit {
     opacity: 0;
     transition: opacity 0.5s ease;
 }
 
-.emargy-animation-fade.emargy-animation-enter {
+.emargy-animation-type-fade .emargy-animation-enter {
     opacity: 1;
     transition: opacity 0.5s ease;
 }
 
-/* Slide animation */
-.emargy-animation-slide.emargy-animation-exit {
+/* Slide Animation */
+.emargy-animation-type-slide .emargy-animation-exit {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.emargy-animation-slide.emargy-animation-enter {
+.emargy-animation-type-slide .emargy-animation-enter {
     opacity: 1;
     transform: translateY(0);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Zoom animation */
-.emargy-animation-zoom.emargy-animation-exit {
+/* Zoom Animation */
+.emargy-animation-type-zoom .emargy-animation-exit {
     opacity: 0;
     transform: scale(0.8);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.emargy-animation-zoom.emargy-animation-enter {
+.emargy-animation-type-zoom .emargy-animation-enter {
     opacity: 1;
     transform: scale(1);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Bounce animation */
-.emargy-animation-bounce.emargy-animation-exit {
+/* Bounce Animation */
+.emargy-animation-type-bounce .emargy-animation-exit {
     opacity: 0;
     transform: scale(1.2);
     transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.emargy-animation-bounce.emargy-animation-enter {
+.emargy-animation-type-bounce .emargy-animation-enter {
     opacity: 1;
     transform: scale(1);
     transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Rotate Animation */
+.emargy-animation-type-rotate .emargy-animation-exit {
+    opacity: 0;
+    transform: rotateX(90deg);
+    transform-origin: top;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.emargy-animation-type-rotate .emargy-animation-enter {
+    opacity: 1;
+    transform: rotateX(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Highlight Animation */
+.emargy-animation-type-highlight .emargy-animated-text {
+    position: relative;
+    padding: 0 0.1em;
+}
+
+.emargy-highlight-shape {
+    position: relative;
+    display: inline-block;
+}
+
+.emargy-highlight-shape.underline {
+    background-position: bottom;
+    background-repeat: no-repeat;
+}
+
+.emargy-highlight-shape.double {
+    background-position: bottom;
+    background-repeat: no-repeat;
+}
+
+.emargy-highlight-shape.rect {
+    padding: 0.2em 0.4em;
+    margin: 0 0.1em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+}
+
+.emargy-highlight-shape.circle {
+    padding: 0.2em 0.4em;
+    margin: 0 0.1em;
+    border-radius: 1em;
+}
+
+.emargy-highlight-shape.curly {
+    position: relative;
+}
+
+.emargy-highlight-shape.curly::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0.3em;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0,10 Q25,0 50,10 T100,10' fill='none' stroke='%23ffc107' stroke-width='3'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+    .emargy-animated-heading {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .emargy-animated-heading {
+        font-size: 1.2em;
+    }
+    
+    .emargy-heading-layout-block .emargy-animated-text {
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+    }
 }
