@@ -1,0 +1,78 @@
+/**
+ * Emargy Timeline Showcase Widget RTL Styles
+ * For Right-to-Left language support
+ */
+
+/* Timeline Items */
+.rtl .emargy-timeline-items {
+    flex-direction: row-reverse;
+}
+
+.rtl .emargy-timeline-item {
+    margin-right: 0;
+    margin-left: 30px;
+}
+
+/* Navigation Arrows */
+.rtl .emargy-nav-prev {
+    right: 25px;
+    left: auto;
+}
+
+.rtl .emargy-nav-next {
+    left: 25px;
+    right: auto;
+}
+
+.rtl .emargy-timeline-nav.emargy-nav-prev i {
+    transform: rotate(180deg);
+}
+
+.rtl .emargy-timeline-nav.emargy-nav-next i {
+    transform: rotate(180deg);
+}
+
+/* Modal Styles */
+.rtl .emargy-modal-close,
+.rtl .emargy-video-modal-close {
+    right: auto;
+    left: 20px;
+}
+
+.rtl .emargy-modal-meta {
+    text-align: right;
+}
+
+/* Wave Styles */
+.rtl .emargy-timeline-wave::before {
+    background: repeating-linear-gradient(
+        to left,
+        transparent,
+        transparent 3px,
+        rgba(255, 255, 255, 0.5) 3px,
+        rgba(255, 255, 255, 0.5) 4px
+    );
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 767px) {
+    .rtl .emargy-nav-prev {
+        right: 15px;
+        left: auto;
+    }
+    
+    .rtl .emargy-nav-next {
+        left: 15px;
+        right: auto;
+    }
+    
+    .rtl .emargy-timeline-item {
+        margin-left: 15px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .rtl .emargy-timeline-item {
+        margin-left: 12px;
+    }
+}

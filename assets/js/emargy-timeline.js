@@ -1,5 +1,6 @@
 /**
- * Emargy Timeline Showcase Widget JavaScript
+ * Emargy Enhanced Timeline Showcase Widget JavaScript
+ * Improved with smoother animations and video support
  */
 
 (function($) {
@@ -47,23 +48,41 @@
         const $navNext = $container.find('.emargy-nav-next');
         const openType = $container.data('open-type');
         
+        // Create indicator dots
+        createIndicatorDots($container, $allItems);
+        
         // Set initial position to center the center item
         if ($centerItem.length) {
             centerTimelineItem($items, $centerItem);
+            updateIndicators($container, $centerItem);
         }
         
         // Initialize navigation
         initNavigation($container, $items, $allItems);
         
+        // Initialize video modal if needed
+        initVideoModal();
+        
         // Handle item click
-        $allItems.on('click', function() {
+        $allItems.on('click', function(e) {
             const $this = $(this);
             const postId = $this.data('post-id');
+            const videoUrl = $this.data('video-url');
+            
+            // Check if click is on play button
+            const isPlayButton = $(e.target).closest('.emargy-play-button').length > 0;
+            
+            // If clicked on play button and has video
+            if (isPlayButton && videoUrl) {
+                e.stopPropagation();
+                openVideoModal(videoUrl, $this.find('.emargy-timeline-title').text());
+                return;
+            }
             
             // Skip if already center
             if ($this.hasClass('emargy-timeline-center-item')) {
                 // Open the post
-                if (postId) {
+                if (postId && !isPlayButton) {
                     openPost(postId, openType);
                 }
                 return;
@@ -75,8 +94,11 @@
             // Add center class to clicked item
             $this.addClass('emargy-timeline-center-item');
             
-            // Center the item
+            // Center the item with animation
             centerTimelineItem($items, $this);
+            
+            // Update indicator dots
+            updateIndicators($container, $this);
         });
         
         // Handle navigation button clicks
@@ -97,6 +119,75 @@
                 centerTimelineItem($items, $container.find('.emargy-timeline-center-item'));
             }
         });
+        
+        // Add keyboard navigation
+        $(document).on('keydown', function(e) {
+            if ($container.is(':visible')) {
+                if (e.keyCode === 37) { // Left arrow
+                    navigateTimeline($container, 'prev');
+                } else if (e.keyCode === 39) { // Right arrow
+                    navigateTimeline($container, 'next');
+                }
+            }
+        });
+    }
+
+    /**
+     * Create indicator dots for navigation
+     * 
+     * @param {jQuery} $container The timeline container
+     * @param {jQuery} $allItems All timeline items
+     */
+    function createIndicatorDots($container, $allItems) {
+        // Create indicators container if it doesn't exist
+        if ($container.find('.emargy-timeline-indicators').length === 0) {
+            $container.append('<div class="emargy-timeline-indicators"></div>');
+            
+            const $indicators = $container.find('.emargy-timeline-indicators');
+            
+            // Create an indicator for each item
+            $allItems.each(function(index) {
+                const $indicator = $('<div class="emargy-timeline-indicator"></div>');
+                $indicator.data('index', index);
+                
+                // Add click event to indicators
+                $indicator.on('click', function() {
+                    const clickedIndex = $(this).data('index');
+                    const $targetItem = $allItems.eq(clickedIndex);
+                    
+                    // Make this item the center item
+                    $allItems.removeClass('emargy-timeline-center-item');
+                    $targetItem.addClass('emargy-timeline-center-item');
+                    
+                    // Center the item
+                    centerTimelineItem($container.find('.emargy-timeline-items'), $targetItem);
+                    
+                    // Update indicators
+                    updateIndicators($container, $targetItem);
+                });
+                
+                $indicators.append($indicator);
+            });
+            
+            // Set the initial active indicator
+            const centerIndex = $allItems.index($container.find('.emargy-timeline-center-item'));
+            $indicators.find('.emargy-timeline-indicator').eq(centerIndex).addClass('active');
+        }
+    }
+
+    /**
+     * Update indicator dots
+     * 
+     * @param {jQuery} $container The timeline container
+     * @param {jQuery} $activeItem The active center item
+     */
+    function updateIndicators($container, $activeItem) {
+        const $indicators = $container.find('.emargy-timeline-indicator');
+        const $allItems = $container.find('.emargy-timeline-item');
+        const activeIndex = $allItems.index($activeItem);
+        
+        $indicators.removeClass('active');
+        $indicators.eq(activeIndex).addClass('active');
     }
 
     /**
@@ -115,30 +206,61 @@
         let isDown = false;
         let startX;
         let scrollLeft;
+        let isDragging = false;
         
-        $items.on('mousedown', function(e) {
+        $items.on('mousedown touchstart', function(e) {
             isDown = true;
+            isDragging = false;
             $items.addClass('active');
-            startX = e.pageX - $items.offset().left;
-            scrollLeft = $items.parent().scrollLeft();
+            
+            if (e.type === 'touchstart') {
+                startX = e.originalEvent.touches[0].pageX - $items.offset().left;
+            } else {
+                startX = e.pageX - $items.offset().left;
+            }
+            
+            const matrix = new WebKitCSSMatrix(getComputedStyle($items[0]).transform);
+            scrollLeft = -matrix.m41;
         });
         
-        $(document).on('mouseup', function() {
-            isDown = false;
-            $items.removeClass('active');
+        $(document).on('mouseup touchend', function() {
+            if (isDown) {
+                isDown = false;
+                $items.removeClass('active');
+                
+                // If it was a real drag, snap to nearest item
+                if (isDragging) {
+                    snapToNearestItem($container);
+                }
+            }
         });
         
         $(document).on('mouseleave', function() {
-            isDown = false;
-            $items.removeClass('active');
+            if (isDown) {
+                isDown = false;
+                $items.removeClass('active');
+                
+                if (isDragging) {
+                    snapToNearestItem($container);
+                }
+            }
         });
         
-        $items.on('mousemove', function(e) {
+        $items.on('mousemove touchmove', function(e) {
             if (!isDown) return;
             e.preventDefault();
-            const x = e.pageX - $items.offset().left;
-            const walk = (x - startX) * 2; // Scroll speed
+            
+            let x;
+            if (e.type === 'touchmove') {
+                x = e.originalEvent.touches[0].pageX - $items.offset().left;
+            } else {
+                x = e.pageX - $items.offset().left;
+            }
+            
+            const walk = (x - startX) * 1.5; // Scroll speed
             const newPosition = scrollLeft - walk;
+            
+            isDragging = true;
             
             // Update transform instead of scrollLeft for smoother animation
             $items.css('transform', `translateX(${-newPosition}px)`);
@@ -155,6 +277,49 @@
                 navigateTimeline($container, 'prev');
             }
         });
+    }
+
+    /**
+     * Snap to the nearest item after dragging
+     * 
+     * @param {jQuery} $container The timeline container
+     */
+    function snapToNearestItem($container) {
+        const $items = $container.find('.emargy-timeline-items');
+        const $allItems = $container.find('.emargy-timeline-item');
+        const containerWidth = $items.parent().width();
+        
+        // Get current position
+        const matrix = new WebKitCSSMatrix(getComputedStyle($items[0]).transform);
+        const currentPosition = -matrix.m41;
+        
+        // Find the item closest to the center
+        let closestItem = null;
+        let closestDistance = Infinity;
+        
+        $allItems.each(function() {
+            const $item = $(this);
+            const itemOffset = $item.position().left;
+            const itemCenter = itemOffset + ($item.outerWidth() / 2);
+            const distanceToCenter = Math.abs((itemCenter - currentPosition) - (containerWidth / 2));
+            
+            if (distanceToCenter < closestDistance) {
+                closestDistance = distanceToCenter;
+                closestItem = $item;
+            }
+        });
+        
+        // Make this item the center item
+        if (closestItem) {
+            $allItems.removeClass('emargy-timeline-center-item');
+            closestItem.addClass('emargy-timeline-center-item');
+            
+            // Center with animation
+            centerTimelineItem($items, closestItem);
+            
+            // Update indicators
+            updateIndicators($container, closestItem);
+        }
     }
 
     /**
@@ -212,8 +377,114 @@
         // Add center class to new center item
         $newCenterItem.addClass('emargy-timeline-center-item');
         
-        // Center the new item
+        // Center the new item with animation
         centerTimelineItem($items, $newCenterItem);
+        
+        // Update indicators
+        updateIndicators($container, $newCenterItem);
+    }
+
+    /**
+     * Initialize video modal
+     */
+    function initVideoModal() {
+        // Create modal if it doesn't exist
+        if ($('#emargy-video-modal').length === 0) {
+            $('body').append(`
+                <div id="emargy-video-modal" class="emargy-video-modal">
+                    <div class="emargy-video-modal-inner">
+                        <div class="emargy-video-modal-title"></div>
+                        <div class="emargy-video-modal-content"></div>
+                        <div class="emargy-video-modal-close">&times;</div>
+                    </div>
+                </div>
+            `);
+            
+            // Handle close button and outside click
+            $(document).on('click', '.emargy-video-modal-close', closeVideoModal);
+            $(document).on('click', '#emargy-video-modal', function(e) {
+                if (e.target === this) {
+                    closeVideoModal();
+                }
+            });
+            
+            // Handle ESC key to close modal
+            $(document).on('keydown', function(e) {
+                if (e.keyCode === 27) { // ESC key
+                    closeVideoModal();
+                }
+            });
+        }
+    }
+
+    /**
+     * Open video modal
+     * 
+     * @param {string} videoUrl The video URL to display
+     * @param {string} title Optional title for the video
+     */
+    function openVideoModal(videoUrl, title) {
+        const $modal = $('#emargy-video-modal');
+        const $content = $modal.find('.emargy-video-modal-content');
+        const $title = $modal.find('.emargy-video-modal-title');
+        
+        // Clear previous content
+        $content.empty();
+        
+        // Set title if provided
+        if (title) {
+            $title.text(title).show();
+        } else {
+            $title.hide();
+        }
+        
+        // Determine video type and add appropriate element
+        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+            // Extract YouTube ID
+            let youtubeId = '';
+            if (videoUrl.includes('v=')) {
+                youtubeId = videoUrl.split('v=')[1];
+                const ampIndex = youtubeId.indexOf('&');
+                if (ampIndex !== -1) {
+                    youtubeId = youtubeId.substring(0, ampIndex);
+                }
+            } else if (videoUrl.includes('youtu.be')) {
+                youtubeId = videoUrl.split('youtu.be/')[1];
+            }
+            
+            if (youtubeId) {
+                $content.html(`<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`);
+            }
+        } else if (videoUrl.includes('vimeo.com')) {
+            // Extract Vimeo ID
+            const vimeoId = videoUrl.split('vimeo.com/')[1];
+            if (vimeoId) {
+                $content.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`);
+            }
+        } else if (videoUrl.match(/\.(mp4|webm|ogg)$/i)) {
+            // Direct video file
+            $content.html(`<video controls autoplay><source src="${videoUrl}"></video>`);
+        } else {
+            // Default to iframe
+            $content.html(`<iframe src="${videoUrl}" frameborder="0" allowfullscreen></iframe>`);
+        }
+        
+        // Show modal
+        $modal.css('display', 'flex').hide().fadeIn(300);
+    }
+
+    /**
+     * Close video modal
+     */
+    function closeVideoModal() {
+        const $modal = $('#emargy-video-modal');
+        const $content = $modal.find('.emargy-video-modal-content');
+        
+        // Fade out modal
+        $modal.fadeOut(300, function() {
+            // Clear content to stop video playback
+            $content.empty();
+        });
     }
 
     /**
@@ -274,36 +545,87 @@
                     }
                     .emargy-modal-content {
                         background-color: #fff;
-                        margin: 10% auto;
-                        padding: 20px;
-                        border-radius: 5px;
+                        margin: 5% auto;
+                        padding: 30px;
+                        border-radius: 8px;
                         max-width: 800px;
                         width: 90%;
                         position: relative;
+                        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+                        transition: transform 0.3s ease;
+                        transform: scale(0.9);
+                    }
+                    .emargy-modal.show .emargy-modal-content {
+                        transform: scale(1);
                     }
                     .emargy-modal-close {
                         position: absolute;
                         right: 20px;
-                        top: 10px;
+                        top: 15px;
                         font-size: 28px;
                         font-weight: bold;
                         cursor: pointer;
+                        color: #999;
+                        transition: color 0.3s ease;
+                    }
+                    .emargy-modal-close:hover {
+                        color: #333;
                     }
                     .emargy-modal-body {
                         padding: 20px 0;
+                    }
+                    .emargy-modal-featured-image {
+                        margin-bottom: 20px;
+                    }
+                    .emargy-modal-featured-image img {
+                        width: 100%;
+                        height: auto;
+                        border-radius: 4px;
+                    }
+                    .emargy-modal-title {
+                        font-size: 24px;
+                        margin-bottom: 15px;
+                        color: #333;
+                    }
+                    .emargy-modal-meta {
+                        margin-top: 20px;
+                        padding-top: 15px;
+                        border-top: 1px solid #eee;
+                        color: #666;
+                        font-size: 14px;
+                    }
+                    .emargy-modal-read-more {
+                        display: inline-block;
+                        margin-top: 20px;
+                        padding: 10px 20px;
+                        background-color: #e22d4b;
+                        color: #fff;
+                        text-decoration: none;
+                        border-radius: 4px;
+                        transition: background-color 0.3s ease;
+                    }
+                    .emargy-modal-read-more:hover {
+                        background-color: #c42742;
                     }
                 </style>
             `);
             
             // Handle close button
             $(document).on('click', '.emargy-modal-close', function() {
-                $('#emargy-modal').hide();
+                $('#emargy-modal').removeClass('show').fadeOut(300);
             });
             
             // Close when clicking outside the modal
             $(document).on('click', '#emargy-modal', function(e) {
                 if (e.target === this) {
-                    $(this).hide();
+                    $(this).removeClass('show').fadeOut(300);
+                }
+            });
+            
+            // Handle ESC key
+            $(document).on('keydown', function(e) {
+                if (e.keyCode === 27) { // ESC key
+                    $('#emargy-modal').removeClass('show').fadeOut(300);
                 }
             });
         }
@@ -319,7 +641,7 @@
             },
             beforeSend: function() {
                 $('#emargy-modal .emargy-modal-body').html('<p>Loading...</p>');
-                $('#emargy-modal').show();
+                $('#emargy-modal').fadeIn(300).addClass('show');
             },
             success: function(response) {
                 if (response.success) {
