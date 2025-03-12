@@ -1,10 +1,36 @@
 /**
  * Emargy Enhanced Timeline Showcase Widget JavaScript
- * Improved with smoother animations and video support
+ * Improved with smoother animations, video support, and optimized performance
  */
 
 (function($) {
     'use strict';
+
+    // Throttle function to limit function calls for better performance
+    function throttle(callback, limit) {
+        var waiting = false;
+        return function() {
+            if (!waiting) {
+                callback.apply(this, arguments);
+                waiting = true;
+                setTimeout(function() {
+                    waiting = false;
+                }, limit);
+            }
+        };
+    }
+
+    // Debounce function to delay function execution until after a period of inactivity
+    function debounce(callback, delay) {
+        var timer;
+        return function() {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                callback.apply(context, args);
+            }, delay);
+        };
+    }
 
     $(document).ready(function() {
         // Initialize all timeline instances
@@ -12,7 +38,7 @@
         
         // Initialize when Elementor frontend is loaded (for edit mode)
         $(window).on('elementor/frontend/init', function() {
-            if (elementorFrontend.isEditMode()) {
+            if (typeof elementorFrontend !== 'undefined' && elementorFrontend.isEditMode()) {
                 elementorFrontend.hooks.addAction('frontend/element_ready/emargy_timeline_showcase.default', function() {
                     initializeTimelines();
                 });
@@ -59,6 +85,9 @@
         
         // Center the item
         centerTimelineItem($items, $centerItem);
+        
+        // Lazy load images that are not immediately visible
+        initLazyLoading($container);
         
         // Update indicator dots
         updateIndicators($container, $centerItem);
@@ -107,35 +136,115 @@
             updateIndicators($container, $this);
         });
         
-        // Handle navigation button clicks
-        $navPrev.on('click', function(e) {
+        // Handle navigation button clicks with throttling
+        $navPrev.on('click', throttle(function(e) {
             e.stopPropagation();
             navigateTimeline($container, 'prev');
-        });
+        }, 300));
         
-        $navNext.on('click', function(e) {
+        $navNext.on('click', throttle(function(e) {
             e.stopPropagation();
             navigateTimeline($container, 'next');
-        });
+        }, 300));
         
-        // Handle resize
-        $(window).on('resize', function() {
+        // Handle resize with debouncing
+        $(window).on('resize', debounce(function() {
             // Recenter the center item
             if ($container.find('.emargy-timeline-center-item').length) {
                 centerTimelineItem($items, $container.find('.emargy-timeline-center-item'));
             }
-        });
+        }, 150));
         
         // Add keyboard navigation
-        $(document).on('keydown', function(e) {
-            if ($container.is(':visible')) {
-                if (e.keyCode === 37) { // Left arrow
-                    navigateTimeline($container, 'prev');
-                } else if (e.keyCode === 39) { // Right arrow
-                    navigateTimeline($container, 'next');
+        if ($container.hasClass('emargy-keyboard-enabled')) {
+            $(document).on('keydown', function(e) {
+                if ($container.is(':visible')) {
+                    if (e.keyCode === 37) { // Left arrow
+                        navigateTimeline($container, 'prev');
+                    } else if (e.keyCode === 39) { // Right arrow
+                        navigateTimeline($container, 'next');
+                    }
                 }
+            });
+        }
+    }
+
+    /**
+     * Initialize lazy loading for timeline item images
+     * 
+     * @param {jQuery} $container The timeline container
+     */
+    function initLazyLoading($container) {
+        const $items = $container.find('.emargy-timeline-item');
+        const $visibleItems = $items.slice(0, 7); // Load first 7 visible items immediately
+        const $lazyItems = $items.slice(7); // Remaining items are lazy loaded
+        
+        // Load visible items immediately
+        $visibleItems.each(function() {
+            const $item = $(this);
+            const $img = $item.find('img[data-src]');
+            
+            if ($img.length) {
+                $img.attr('src', $img.data('src')).removeAttr('data-src');
             }
         });
+        
+        // Setup Intersection Observer for lazy items
+        if ('IntersectionObserver' in window) {
+            const lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        const $target = $(entry.target);
+                        const $img = $target.find('img[data-src]');
+                        
+                        if ($img.length) {
+                            $img.attr('src', $img.data('src')).removeAttr('data-src');
+                            $img.on('load', function() {
+                                $img.addClass('loaded');
+                            });
+                        }
+                        
+                        // Stop observing this element
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            // Observe each lazy item
+            $lazyItems.each(function() {
+                lazyImageObserver.observe(this);
+            });
+        } else {
+            // Fallback for browsers that don't support Intersection Observer
+            $(window).on('scroll', debounce(function() {
+                $lazyItems.each(function() {
+                    const $item = $(this);
+                    const $img = $item.find('img[data-src]');
+                    
+                    if ($img.length && isElementInViewport($item[0])) {
+                        $img.attr('src', $img.data('src')).removeAttr('data-src');
+                        // Remove from lazy items array
+                        $lazyItems = $lazyItems.not($item);
+                    }
+                });
+            }, 200));
+        }
+    }
+
+    /**
+     * Check if element is in viewport
+     * 
+     * @param {Element} el The element to check
+     * @return {boolean} True if element is in viewport
+     */
+    function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+        );
     }
 
     /**
@@ -225,7 +334,9 @@
                 startX = e.pageX - $items.offset().left;
             }
             
-            const matrix = new WebKitCSSMatrix(getComputedStyle($items[0]).transform);
+            // Use a more reliable way to get current transformation
+            const transform = getComputedStyle($items[0]).transform;
+            const matrix = new WebKitCSSMatrix(transform === 'none' ? '' : transform);
             scrollLeft = -matrix.m41;
         });
         
@@ -268,21 +379,25 @@
             
             isDragging = true;
             
-            // Update transform instead of scrollLeft for smoother animation
-            $items.css('transform', `translateX(${-newPosition}px)`);
+            // Use requestAnimationFrame for smoother animation
+            requestAnimationFrame(function() {
+                $items.css('transform', `translateX(${-newPosition}px)`);
+            });
         });
         
-        // Handle mousewheel
-        $container.on('wheel', function(e) {
-            e.preventDefault();
-            
-            // Determine direction and navigate
-            if (e.originalEvent.deltaY > 0) {
-                navigateTimeline($container, 'next');
-            } else {
-                navigateTimeline($container, 'prev');
-            }
-        });
+        // Handle mousewheel with throttling
+        if ($container.hasClass('emargy-mousewheel-enabled')) {
+            $container.on('wheel', throttle(function(e) {
+                e.preventDefault();
+                
+                // Determine direction and navigate
+                if (e.originalEvent.deltaY > 0) {
+                    navigateTimeline($container, 'next');
+                } else {
+                    navigateTimeline($container, 'prev');
+                }
+            }, 300));
+        }
     }
 
     /**
@@ -296,7 +411,8 @@
         const containerWidth = $items.parent().width();
         
         // Get current position
-        const matrix = new WebKitCSSMatrix(getComputedStyle($items[0]).transform);
+        const transform = getComputedStyle($items[0]).transform;
+        const matrix = new WebKitCSSMatrix(transform === 'none' ? '' : transform);
         const currentPosition = -matrix.m41;
         
         // Find the item closest to the center
@@ -343,8 +459,10 @@
         // Calculate the position to center the item
         const scrollTo = itemOffset - (containerWidth / 2) + (itemWidth / 2);
         
-        // Animate to the position
-        $items.css('transform', `translateX(${-scrollTo}px)`);
+        // Use requestAnimationFrame for smoother animation
+        requestAnimationFrame(function() {
+            $items.css('transform', `translateX(${-scrollTo}px)`);
+        });
     }
 
     /**
@@ -388,6 +506,27 @@
         
         // Update indicators
         updateIndicators($container, $newCenterItem);
+        
+        // Load lazy images if needed
+        const $img = $newCenterItem.find('img[data-src]');
+        if ($img.length) {
+            $img.attr('src', $img.data('src')).removeAttr('data-src');
+        }
+        
+        // Preload next and previous images
+        const preloadIndices = [
+            (newIndex + 1) % $allItems.length,
+            (newIndex - 1 + $allItems.length) % $allItems.length
+        ];
+        
+        preloadIndices.forEach(function(index) {
+            const $preloadItem = $allItems.eq(index);
+            const $preloadImg = $preloadItem.find('img[data-src]');
+            
+            if ($preloadImg.length) {
+                $preloadImg.attr('src', $preloadImg.data('src')).removeAttr('data-src');
+            }
+        });
     }
 
     /**
@@ -444,28 +583,31 @@
             $title.hide();
         }
         
+        // Sanitize the URL
+        if (!isValidUrl(videoUrl)) {
+            console.error('Invalid video URL:', videoUrl);
+            return;
+        }
+        
         // Determine video type and add appropriate element
         if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-            // Extract YouTube ID
+            // Extract YouTube ID safely
             let youtubeId = '';
-            if (videoUrl.includes('v=')) {
-                youtubeId = videoUrl.split('v=')[1];
-                const ampIndex = youtubeId.indexOf('&');
-                if (ampIndex !== -1) {
-                    youtubeId = youtubeId.substring(0, ampIndex);
-                }
-            } else if (videoUrl.includes('youtu.be')) {
-                youtubeId = videoUrl.split('youtu.be/')[1];
-            }
+            const youtubeRegex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const match = videoUrl.match(youtubeRegex);
             
-            if (youtubeId) {
-                $content.html(`<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`);
+            if (match && match[1]) {
+                youtubeId = match[1];
+                $content.html(`<iframe src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" allow="autoplay" frameborder="0" allowfullscreen></iframe>`);
             }
         } else if (videoUrl.includes('vimeo.com')) {
-            // Extract Vimeo ID
-            const vimeoId = videoUrl.split('vimeo.com/')[1];
-            if (vimeoId) {
-                $content.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>`);
+            // Extract Vimeo ID safely
+            const vimeoRegex = /vimeo\.com\/(?:video\/|channels\/\S+\/|groups\/[^\/]+\/videos\/|)(\d+)/;
+            const match = videoUrl.match(vimeoRegex);
+            
+            if (match && match[1]) {
+                const vimeoId = match[1];
+                $content.html(`<iframe src="https://player.vimeo.com/video/${vimeoId}?autoplay=1" allow="autoplay" frameborder="0" allowfullscreen></iframe>`);
             }
         } else if (videoUrl.match(/\.(mp4|webm|ogg)$/i)) {
             // Direct video file
@@ -477,6 +619,21 @@
         
         // Show modal
         $modal.css('display', 'flex').hide().fadeIn(300);
+    }
+
+    /**
+     * Validate URL for security
+     * 
+     * @param {string} url The URL to validate
+     * @return {boolean} True if URL is valid
+     */
+    function isValidUrl(url) {
+        try {
+            const parsedUrl = new URL(url);
+            return ['http:', 'https:'].includes(parsedUrl.protocol);
+        } catch (e) {
+            return false;
+        }
     }
 
     /**
@@ -500,7 +657,10 @@
      * @param {string} openType How to open the post ('popup' or 'page')
      */
     function openPost(postId, openType) {
-        console.log('Opening post', postId, openType); // Debug line to check if this function is being called
+        if (!postId || isNaN(parseInt(postId))) {
+            console.error('Invalid post ID:', postId);
+            return;
+        }
         
         if (openType === 'popup') {
             // Open in a popup (requires Elementor Pro or a custom popup implementation)
@@ -514,7 +674,7 @@
                 // Fallback to a basic modal
                 openBasicModal(postId);
             }
-        } else {
+        } else if (openType === 'page') {
             // Open in a new page
             window.location.href = `${window.location.origin}/?p=${postId}`;
         }
@@ -638,6 +798,14 @@
             });
         }
         
+        // Show loading state
+        $('#emargy-modal .emargy-modal-body').html('<p>Loading...</p>');
+        $('#emargy-modal').fadeIn(300).addClass('show');
+        
+        // Get nonce from global variable
+        const nonce = typeof emargyTimelineVars !== 'undefined' && emargyTimelineVars.nonce ? 
+            emargyTimelineVars.nonce : '';
+            
         // Get post content via AJAX
         $.ajax({
             url: window.location.origin + '/wp-admin/admin-ajax.php',
@@ -645,21 +813,17 @@
             data: {
                 action: 'emargy_get_post_content',
                 post_id: postId,
-                nonce: emargyTimelineVars.nonce || ''
-            },
-            beforeSend: function() {
-                $('#emargy-modal .emargy-modal-body').html('<p>Loading...</p>');
-                $('#emargy-modal').fadeIn(300).addClass('show');
+                nonce: nonce
             },
             success: function(response) {
                 if (response.success) {
                     $('#emargy-modal .emargy-modal-body').html(response.data);
                 } else {
-                    $('#emargy-modal .emargy-modal-body').html('<p>Error loading content. Please try again.</p>');
+                    $('#emargy-modal .emargy-modal-body').html('<p>Error loading content: ' + (response.data || 'Unknown error') + '</p>');
                 }
             },
-            error: function() {
-                $('#emargy-modal .emargy-modal-body').html('<p>Error loading content. Please try again.</p>');
+            error: function(xhr, status, error) {
+                $('#emargy-modal .emargy-modal-body').html('<p>Error loading content. Please try again. Status: ' + status + ', Error: ' + error + '</p>');
             }
         });
     }

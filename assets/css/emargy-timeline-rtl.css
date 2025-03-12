@@ -1,9 +1,9 @@
 /**
  * Emargy Timeline Showcase Widget RTL Styles
- * For Right-to-Left language support
+ * Enhanced for Right-to-Left language support
  */
 
-/* Timeline Items */
+/* Base RTL Conversions */
 .rtl .emargy-timeline-items {
     flex-direction: row-reverse;
 }
@@ -11,6 +11,28 @@
 .rtl .emargy-timeline-item {
     margin-right: 0;
     margin-left: 30px;
+}
+
+/* Timeline Line */
+.rtl .emargy-timeline-line {
+    right: 0;
+    left: auto;
+}
+
+/* Timeline Wave */
+.rtl .emargy-timeline-wave::before {
+    background: repeating-linear-gradient(
+        to left,
+        transparent,
+        transparent 3px,
+        rgba(255, 255, 255, 0.5) 3px,
+        rgba(255, 255, 255, 0.5) 4px
+    );
+}
+
+.rtl .emargy-timeline-wave::after {
+    right: 0;
+    left: auto;
 }
 
 /* Navigation Arrows */
@@ -43,18 +65,60 @@
     text-align: right;
 }
 
-/* Wave Styles */
-.rtl .emargy-timeline-wave::before {
-    background: repeating-linear-gradient(
-        to left,
-        transparent,
-        transparent 3px,
-        rgba(255, 255, 255, 0.5) 3px,
-        rgba(255, 255, 255, 0.5) 4px
-    );
+.rtl .emargy-modal-read-more {
+    float: right;
+}
+
+/* Timeline Content */
+.rtl .emargy-timeline-content {
+    text-align: right;
+}
+
+/* Timeline Numbers */
+.rtl .emargy-timeline-number {
+    direction: ltr; /* Keep numbers in LTR direction */
+}
+
+/* Improved RTL Animation Support */
+.rtl .emargy-animation-slide.emargy-animation-exit {
+    transform: translateX(20px); /* Reverse the slide direction */
+}
+
+.rtl .emargy-animation-slide.emargy-animation-enter {
+    transform: translateX(0);
+}
+
+/* Fix for RTL drag & scroll */
+.rtl .emargy-timeline-container.emargy-drag-enabled .emargy-timeline-items {
+    direction: rtl;
+}
+
+.rtl .emargy-timeline-container.emargy-drag-enabled .emargy-timeline-content {
+    direction: rtl;
+}
+
+/* RTL Hover Effects */
+.rtl .emargy-hover-enabled .emargy-timeline-item:hover .emargy-timeline-item-inner {
+    transform: translateY(-10px);
+}
+
+.rtl .emargy-hover-enabled .emargy-timeline-center-item:hover .emargy-timeline-item-inner {
+    transform: scale(2.2) translateY(-5px);
 }
 
 /* Responsive Adjustments */
+@media screen and (max-width: 1200px) {
+    .rtl .emargy-timeline-item {
+        margin-left: 25px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .rtl .emargy-timeline-item {
+        margin-left: 20px;
+    }
+}
+
 @media screen and (max-width: 767px) {
     .rtl .emargy-nav-prev {
         right: 15px;

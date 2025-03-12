@@ -26,17 +26,88 @@ class Emargy_AJAX_Handler {
         add_action('wp_ajax_nopriv_emargy_get_video_info', array($this, 'get_video_info'));
         
         add_action('wp_ajax_emargy_get_terms', array($this, 'get_taxonomy_terms'));
+
+        // Add rate limiting for AJAX requests
+        add_action('init', array($this, 'setup_rate_limiting'));
+    }
+
+    /**
+     * Setup rate limiting for AJAX requests
+     */
+    public function setup_rate_limiting() {
+        // Only apply rate limiting on AJAX requests
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            $this->check_rate_limit();
+        }
+    }
+
+    /**
+     * Check and enforce rate limiting
+     */
+    private function check_rate_limit() {
+        // Get client IP
+        $client_ip = $this->get_client_ip();
+        
+        // Initialize rate limiting
+        $rate_key = 'emargy_rate_' . md5($client_ip);
+        $rate_limit = 60; // Requests per minute
+        $rate_window = 60; // 1 minute window
+        
+        // Get current count and time
+        $rate_count = get_transient($rate_key);
+        
+        if (false === $rate_count) {
+            // First request, set to 1
+            set_transient($rate_key, 1, $rate_window);
+        } else if ($rate_count < $rate_limit) {
+            // Increment request count
+            set_transient($rate_key, $rate_count + 1, $rate_window);
+        } else {
+            // Too many requests
+            header('HTTP/1.1 429 Too Many Requests');
+            wp_send_json_error('Rate limit exceeded. Please try again later.');
+            exit;
+        }
+    }
+
+    /**
+     * Get client IP address
+     * 
+     * @return string Client IP address
+     */
+    private function get_client_ip() {
+        $ip_keys = array(
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_X_CLUSTER_CLIENT_IP',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR'
+        );
+        
+        foreach ($ip_keys as $key) {
+            if (isset($_SERVER[$key]) && filter_var($_SERVER[$key], FILTER_VALIDATE_IP)) {
+                return $_SERVER[$key];
+            }
+        }
+        
+        // Default to server IP if no client IP found
+        return '127.0.0.1';
     }
 
     /**
      * Get post content for modal/popup
      */
     public function get_post_content() {
-        // Check for nonce
-        check_ajax_referer('emargy_timeline_nonce', 'nonce');
+        // Verify nonce with proper error handling
+        if (!check_ajax_referer('emargy_timeline_nonce', 'nonce', false)) {
+            wp_send_json_error('Security check failed. Please refresh the page and try again.');
+            return;
+        }
 
         // Get post ID
-        $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
 
         if (!$post_id) {
             wp_send_json_error('Invalid post ID');
@@ -51,6 +122,12 @@ class Emargy_AJAX_Handler {
             return;
         }
 
+        // Ensure the post is published and user has permission to view it
+        if ($post->post_status !== 'publish' && !current_user_can('read_post', $post_id)) {
+            wp_send_json_error('You do not have permission to view this post');
+            return;
+        }
+
         // Check if we should include video
         $include_video = isset($_POST['include_video']) ? (bool)$_POST['include_video'] : false;
         $video_field = isset($_POST['video_field']) ? sanitize_text_field($_POST['video_field']) : 'video_url';
@@ -59,6 +136,11 @@ class Emargy_AJAX_Handler {
         $video_url = '';
         if ($include_video) {
             $video_url = get_post_meta($post_id, $video_field, true);
+            
+            // Validate video URL if provided
+            if (!empty($video_url) && !$this->is_valid_url($video_url)) {
+                $video_url = '';
+            }
         }
 
         // Prepare the content
@@ -73,8 +155,7 @@ class Emargy_AJAX_Handler {
             
             if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
                 // Extract YouTube ID
-                preg_match('/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $video_url, $matches);
-                $youtube_id = $matches[1] ?? '';
+                $youtube_id = $this->get_youtube_id($video_url);
                 
                 if ($youtube_id) {
                     $content .= '<div class="emargy-video-responsive">';
@@ -83,8 +164,7 @@ class Emargy_AJAX_Handler {
                 }
             } elseif (strpos($video_url, 'vimeo.com') !== false) {
                 // Extract Vimeo ID
-                preg_match('/vimeo\.com\/(?:video\/|channels\/\S+\/|groups\/[^\/]+\/videos\/|)(\d+)/', $video_url, $matches);
-                $vimeo_id = $matches[1] ?? '';
+                $vimeo_id = $this->get_vimeo_id($video_url);
                 
                 if ($vimeo_id) {
                     $content .= '<div class="emargy-video-responsive">';
@@ -181,13 +261,16 @@ class Emargy_AJAX_Handler {
      * Get video information (title, thumbnail, etc.)
      */
     public function get_video_info() {
-        // Check for nonce
-        check_ajax_referer('emargy_timeline_nonce', 'nonce');
+        // Verify nonce with proper error handling
+        if (!check_ajax_referer('emargy_timeline_nonce', 'nonce', false)) {
+            wp_send_json_error('Security check failed.');
+            return;
+        }
         
         // Get video URL
         $video_url = isset($_POST['video_url']) ? esc_url_raw($_POST['video_url']) : '';
         
-        if (!$video_url) {
+        if (!$video_url || !$this->is_valid_url($video_url)) {
             wp_send_json_error('Invalid video URL');
             return;
         }
@@ -200,9 +283,7 @@ class Emargy_AJAX_Handler {
         
         // YouTube
         if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
-            // Extract YouTube ID
-            preg_match('/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $video_url, $matches);
-            $youtube_id = $matches[1] ?? '';
+            $youtube_id = $this->get_youtube_id($video_url);
             
             if ($youtube_id) {
                 $video_info['thumbnail'] = 'https://img.youtube.com/vi/' . $youtube_id . '/maxresdefault.jpg';
@@ -211,13 +292,26 @@ class Emargy_AJAX_Handler {
                 // Try to get title (requires API key, so this is optional)
                 $api_key = get_option('emargy_youtube_api_key');
                 if ($api_key) {
-                    $api_response = wp_remote_get('https://www.googleapis.com/youtube/v3/videos?id=' . $youtube_id . '&key=' . $api_key . '&part=snippet');
+                    $api_url = add_query_arg(
+                        array(
+                            'id' => $youtube_id,
+                            'key' => $api_key,
+                            'part' => 'snippet',
+                            'fields' => 'items(snippet(title))'
+                        ),
+                        'https://www.googleapis.com/youtube/v3/videos'
+                    );
                     
-                    if (!is_wp_error($api_response) && 200 === wp_remote_retrieve_response_code($api_response)) {
-                        $api_body = json_decode(wp_remote_retrieve_body($api_response), true);
+                    $response = wp_safe_remote_get($api_url, array(
+                        'timeout' => 15,
+                        'sslverify' => true
+                    ));
+                    
+                    if (!is_wp_error($response) && 200 === wp_remote_retrieve_response_code($response)) {
+                        $api_body = json_decode(wp_remote_retrieve_body($response), true);
                         
                         if (isset($api_body['items'][0]['snippet']['title'])) {
-                            $video_info['title'] = $api_body['items'][0]['snippet']['title'];
+                            $video_info['title'] = sanitize_text_field($api_body['items'][0]['snippet']['title']);
                         }
                     }
                 }
@@ -225,22 +319,24 @@ class Emargy_AJAX_Handler {
         }
         // Vimeo
         elseif (strpos($video_url, 'vimeo.com') !== false) {
-            // Extract Vimeo ID
-            preg_match('/vimeo\.com\/(?:video\/|channels\/\S+\/|groups\/[^\/]+\/videos\/|)(\d+)/', $video_url, $matches);
-            $vimeo_id = $matches[1] ?? '';
+            $vimeo_id = $this->get_vimeo_id($video_url);
             
             if ($vimeo_id) {
                 $video_info['provider'] = 'vimeo';
                 
                 // Get video info from Vimeo API
-                $api_response = wp_remote_get('https://vimeo.com/api/v2/video/' . $vimeo_id . '.json');
+                $api_url = 'https://vimeo.com/api/v2/video/' . $vimeo_id . '.json';
+                $response = wp_safe_remote_get($api_url, array(
+                    'timeout' => 15,
+                    'sslverify' => true
+                ));
                 
-                if (!is_wp_error($api_response) && 200 === wp_remote_retrieve_response_code($api_response)) {
-                    $api_body = json_decode(wp_remote_retrieve_body($api_response), true);
+                if (!is_wp_error($response) && 200 === wp_remote_retrieve_response_code($response)) {
+                    $api_body = json_decode(wp_remote_retrieve_body($response), true);
                     
                     if (isset($api_body[0])) {
-                        $video_info['thumbnail'] = $api_body[0]['thumbnail_large'];
-                        $video_info['title'] = $api_body[0]['title'];
+                        $video_info['thumbnail'] = esc_url_raw($api_body[0]['thumbnail_large']);
+                        $video_info['title'] = sanitize_text_field($api_body[0]['title']);
                     }
                 }
             }
@@ -254,7 +350,10 @@ class Emargy_AJAX_Handler {
      */
     public function get_taxonomy_terms() {
         // Check for nonce and permissions
-        check_ajax_referer('emargy_timeline_nonce', 'nonce');
+        if (!check_ajax_referer('emargy_timeline_nonce', 'nonce', false)) {
+            wp_send_json_error('Security check failed.');
+            return;
+        }
         
         if (!current_user_can('edit_posts')) {
             wp_send_json_error('Insufficient permissions');
@@ -269,22 +368,60 @@ class Emargy_AJAX_Handler {
             return;
         }
         
-        $terms = get_terms([
+        $terms = get_terms(array(
             'taxonomy' => $taxonomy,
             'hide_empty' => false,
-        ]);
+        ));
         
         if (is_wp_error($terms)) {
             wp_send_json_error($terms->get_error_message());
             return;
         }
         
-        $options = [];
+        $options = array();
         foreach ($terms as $term) {
             $options[$term->term_id] = $term->name;
         }
         
         wp_send_json_success($options);
+    }
+
+    /**
+     * Extract YouTube video ID from URL
+     *
+     * @param string $url YouTube URL
+     * @return string|false YouTube ID or false if not found
+     */
+    private function get_youtube_id($url) {
+        $pattern = '/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/';
+        if (preg_match($pattern, $url, $matches)) {
+            return $matches[1];
+        }
+        return false;
+    }
+
+    /**
+     * Extract Vimeo video ID from URL
+     *
+     * @param string $url Vimeo URL
+     * @return string|false Vimeo ID or false if not found
+     */
+    private function get_vimeo_id($url) {
+        $pattern = '/vimeo\.com\/(?:video\/|channels\/\S+\/|groups\/[^\/]+\/videos\/|)(\d+)/';
+        if (preg_match($pattern, $url, $matches)) {
+            return $matches[1];
+        }
+        return false;
+    }
+
+    /**
+     * Validate URL
+     *
+     * @param string $url URL to validate
+     * @return bool True if URL is valid
+     */
+    private function is_valid_url($url) {
+        return filter_var($url, FILTER_VALIDATE_URL) !== false;
     }
 }
 
