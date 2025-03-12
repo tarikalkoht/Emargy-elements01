@@ -3,7 +3,7 @@
  * Plugin Name: Emargy Elements
  * Plugin URI: https://www.emargy.com
  * Description: A premium addon for Elementor that allows you to create interactive timelines to showcase media, posts, projects, services, or any other content with an elegant professional design.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Emargy
  * Author URI: https://www.emargy.com
  * Text Domain: emargy-elements
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('EMARGY_ELEMENTS_VERSION', '2.0.0');
+define('EMARGY_ELEMENTS_VERSION', '2.1.0');
 define('EMARGY_ELEMENTS_FILE', __FILE__);
 define('EMARGY_ELEMENTS_PATH', plugin_dir_path(__FILE__));
 define('EMARGY_ELEMENTS_URL', plugins_url('/', __FILE__));
@@ -62,11 +62,19 @@ add_action('admin_enqueue_scripts', 'emargy_elements_admin_scripts');
  * Localize script variables
  */
 function emargy_elements_localize_script() {
-    wp_localize_script('emargy-timeline-script', 'emargyTimelineVars', array(
+    // Basic variables
+    $vars = array(
         'ajaxurl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('emargy_timeline_nonce'),
         'isRTL' => is_rtl() ? true : false,
-    ));
+        'version' => EMARGY_ELEMENTS_VERSION,
+    );
+    
+    // Allow plugins/themes to add more variables
+    $vars = apply_filters('emargy_timeline_vars', $vars);
+    
+    // Localize the script
+    wp_localize_script('emargy-timeline-script', 'emargyTimelineVars', $vars);
 }
 add_action('wp_enqueue_scripts', 'emargy_elements_localize_script', 20);
 
@@ -245,7 +253,7 @@ add_action('elementor/loaded', function() {
 /**
  * Add RTL support
  */
-function emargy_elements_rtl_support($styles) {
+function emargy_elements_rtl_support() {
     if (is_rtl()) {
         wp_enqueue_style('emargy-timeline-rtl', EMARGY_ELEMENTS_URL . 'assets/css/emargy-timeline-rtl.css', array('emargy-timeline-style'), EMARGY_ELEMENTS_VERSION);
     }
@@ -265,6 +273,16 @@ function emargy_elements_register_admin_menu() {
         'dashicons-layout',
         30
     );
+    
+    // Add cache settings submenu
+    add_submenu_page(
+        'emargy-elements',
+        __('Cache Settings', 'emargy-elements'),
+        __('Cache Settings', 'emargy-elements'),
+        'manage_options',
+        'emargy-elements-cache',
+        'emargy_elements_cache_page'
+    );
 }
 add_action('admin_menu', 'emargy_elements_register_admin_menu');
 
@@ -277,6 +295,9 @@ function emargy_elements_admin_page() {
         <h1>Emargy Elements - Timeline Showcase</h1>
         
         <div class="emargy-admin-content">
+            <!-- Content section -->
+            <?php do_action('emargy_admin_before_content'); ?>
+            
             <div class="emargy-admin-card">
                 <h2>Getting Started</h2>
                 <p>Create beautiful and interactive timeline showcases for your content with our premium Elementor addon.</p>
@@ -308,6 +329,8 @@ function emargy_elements_admin_page() {
                     <li><code>bg_color</code>: Background color (e.g., #e22d4b)</li>
                 </ul>
             </div>
+            
+            <?php do_action('emargy_admin_after_content'); ?>
         </div>
         
         <div class="emargy-admin-sidebar">
@@ -323,6 +346,8 @@ function emargy_elements_admin_page() {
                 <p>If you enjoy using Emargy Elements, please consider leaving us a review!</p>
                 <p><a href="https://wordpress.org/support/plugin/emargy-elements/reviews/#new-post" target="_blank" class="button">Leave a Review</a></p>
             </div>
+            
+            <?php do_action('emargy_admin_sidebar'); ?>
         </div>
     </div>
     
@@ -376,4 +401,192 @@ function emargy_elements_admin_page() {
         }
     </style>
     <?php
+}
+
+/**
+ * Cache settings page
+ */
+function emargy_elements_cache_page() {
+    ?>
+    <div class="wrap">
+        <h1><?php _e('Emargy Elements - Cache Settings', 'emargy-elements'); ?></h1>
+        
+        <?php
+        // Load cache settings if available
+        if (function_exists('Emargy_Cache::render_cache_settings')) {
+            Emargy_Cache::render_cache_settings();
+        } else {
+            echo '<div class="notice notice-warning"><p>' . __('Cache system not available. Please try reinstalling the plugin.', 'emargy-elements') . '</p></div>';
+        }
+        ?>
+    </div>
+    <?php
+}
+
+/**
+ * Initialize cache system
+ */
+function emargy_elements_init_cache() {
+    // Create cache instance if file exists
+    $cache_file = EMARGY_ELEMENTS_PATH . 'vendor/emargy-cache-system.php';
+    if (file_exists($cache_file) && !class_exists('Emargy_Cache')) {
+        require_once $cache_file;
+    }
+}
+add_action('init', 'emargy_elements_init_cache', 5);
+
+/**
+ * Add hook to clear cache on post updates
+ */
+function emargy_elements_clear_cache_on_post_update($post_id) {
+    // Skip autosaves and revisions
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (wp_is_post_revision($post_id)) return;
+    
+    // Clear cache if class exists
+    if (class_exists('Emargy_Cache') && method_exists('Emargy_Cache', 'clear_post_cache')) {
+        Emargy_Cache::clear_post_cache($post_id);
+    }
+}
+add_action('save_post', 'emargy_elements_clear_cache_on_post_update');
+add_action('deleted_post', 'emargy_elements_clear_cache_on_post_update');
+add_action('trashed_post', 'emargy_elements_clear_cache_on_post_update');
+add_action('edit_term', 'emargy_elements_clear_cache_on_term_update');
+add_action('delete_term', 'emargy_elements_clear_cache_on_term_update');
+
+/**
+ * Clear cache on term updates
+ */
+function emargy_elements_clear_cache_on_term_update($term_id) {
+    // Clear cache if class exists
+    if (class_exists('Emargy_Cache') && method_exists('Emargy_Cache', 'clear_term_cache')) {
+        Emargy_Cache::clear_term_cache($term_id);
+    }
+}
+
+/**
+ * Clear all cache via admin action
+ */
+function emargy_elements_clear_all_cache() {
+    if (isset($_GET['emargy_clear_cache']) && current_user_can('manage_options')) {
+        check_admin_referer('emargy_clear_cache', 'nonce');
+        
+        // Clear cache if class exists
+        if (class_exists('Emargy_Cache') && method_exists('Emargy_Cache', 'clear_all_cache')) {
+            Emargy_Cache::clear_all_cache();
+            
+            // Redirect back with success message
+            wp_redirect(add_query_arg('emargy_cache_cleared', '1', remove_query_arg('emargy_clear_cache', wp_get_referer())));
+            exit;
+        }
+    }
+}
+add_action('admin_init', 'emargy_elements_clear_all_cache');
+
+/**
+ * Add cache cleared notice
+ */
+function emargy_elements_cache_cleared_notice() {
+    if (isset($_GET['emargy_cache_cleared']) && current_user_can('manage_options')) {
+        ?>
+        <div class="notice notice-success is-dismissible">
+            <p><?php _e('Emargy Elements cache has been cleared successfully.', 'emargy-elements'); ?></p>
+        </div>
+        <?php
+    }
+}
+add_action('admin_notices', 'emargy_elements_cache_cleared_notice');
+
+/**
+ * Add version information to admin footer
+ */
+function emargy_elements_admin_footer_text($footer_text) {
+    $current_screen = get_current_screen();
+    
+    // Only modify on our admin pages
+    if (isset($current_screen->parent_file) && $current_screen->parent_file === 'emargy-elements') {
+        $footer_text = sprintf(
+            __('Emargy Elements v%s | <a href="%s" target="_blank">Documentation</a> | <a href="%s" target="_blank">Support</a>', 'emargy-elements'),
+            EMARGY_ELEMENTS_VERSION,
+            'https://www.emargy.com/docs/',
+            'https://www.emargy.com/support/'
+        );
+    }
+    
+    return $footer_text;
+}
+add_filter('admin_footer_text', 'emargy_elements_admin_footer_text');
+
+/**
+ * Register REST API endpoints
+ */
+function emargy_elements_register_rest_routes() {
+    register_rest_route('emargy/v1', '/timeline', array(
+        'methods' => 'GET',
+        'callback' => 'emargy_elements_rest_get_timeline',
+        'permission_callback' => '__return_true',
+    ));
+}
+add_action('rest_api_init', 'emargy_elements_register_rest_routes');
+
+/**
+ * REST API callback for timeline data
+ */
+function emargy_elements_rest_get_timeline($request) {
+    // Get parameters
+    $type = $request->get_param('type') ? sanitize_text_field($request->get_param('type')) : 'post';
+    $limit = $request->get_param('limit') ? absint($request->get_param('limit')) : 10;
+    $category = $request->get_param('category') ? array_map('absint', explode(',', $request->get_param('category'))) : array();
+    
+    // Build query args
+    $args = array(
+        'post_type' => $type,
+        'posts_per_page' => $limit,
+        'post_status' => 'publish',
+    );
+    
+    // Add category filter if set
+    if (!empty($category)) {
+        $args['tax_query'] = array(
+            array(
+                'taxonomy' => 'category',
+                'field' => 'term_id',
+                'terms' => $category,
+            )
+        );
+    }
+    
+    // Get posts using cache if available
+    if (function_exists('emargy_get_cached_query')) {
+        $query = emargy_get_cached_query($args, 'rest_api');
+    } else {
+        $query = new WP_Query($args);
+    }
+    
+    // Prepare response data
+    $data = array();
+    
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            
+            $post_data = array(
+                'id' => get_the_ID(),
+                'title' => get_the_title(),
+                'excerpt' => wp_trim_words(get_the_excerpt(), 20),
+                'date' => get_the_date(),
+                'permalink' => get_permalink(),
+            );
+            
+            // Add thumbnail if available
+            if (has_post_thumbnail()) {
+                $post_data['thumbnail'] = get_the_post_thumbnail_url(null, 'medium');
+            }
+            
+            $data[] = $post_data;
+        }
+        wp_reset_postdata();
+    }
+    
+    return new WP_REST_Response($data, 200);
 }

@@ -1,0 +1,716 @@
+# Copyright (C) 2025 Emargy
+# This file is distributed under the same license as the Emargy Elements plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Emargy Elements 2.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/emargy-elements\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-03-12T10:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.7.0\n"
+"X-Domain: emargy-elements\n"
+
+#. Plugin Name of the plugin
+msgid "Emargy Elements"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://www.emargy.com"
+msgstr ""
+
+#. Description of the plugin
+msgid "A premium addon for Elementor that allows you to create interactive timelines to showcase media, posts, projects, services, or any other content with an elegant professional design."
+msgstr ""
+
+#. Author of the plugin
+msgid "Emargy"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.emargy.com"
+msgstr ""
+
+#: emargy-elements.php:122
+msgid "Support Ticket Lifecycle"
+msgstr ""
+
+#: includes/class-emargy-elements.php:107
+msgid "\"%1$s\" requires \"%2$s\" to be installed and activated."
+msgstr ""
+
+#: includes/class-emargy-elements.php:172
+msgid "Emargy Elements"
+msgstr ""
+
+#: includes/enhancements/accessibility-improvements.php:47
+msgid "Timeline Showcase"
+msgstr ""
+
+#: includes/enhancements/accessibility-improvements.php:88
+msgid "Close modal"
+msgstr ""
+
+#: includes/enhancements/accessibility-improvements.php:134
+msgid "Timeline navigation. Use left and right arrow keys to navigate between items. Press Enter to select an item."
+msgstr ""
+
+#: includes/enhancements/ajax-handler.php:293
+msgid "Published on"
+msgstr ""
+
+#: includes/enhancements/ajax-handler.php:296
+msgid "By"
+msgstr ""
+
+#: includes/enhancements/ajax-handler.php:302
+msgid "Categories:"
+msgstr ""
+
+#: includes/enhancements/ajax-handler.php:326
+msgid "Read full post"
+msgstr ""
+
+#: includes/enhancements/php-compatibility.php:40
+msgid "Emargy Elements: Your PHP version (%1$s) is below the recommended version (%2$s). Some features may not work correctly. Please upgrade your PHP version for better performance and security."
+msgstr ""
+
+#: includes/enhancements/php-compatibility.php:75
+msgid "Emargy Elements Error"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:68
+msgid "WooCommerce Products"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:179
+msgid "Sale!"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:202
+msgid "In stock"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:205
+msgid "Out of stock"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:275
+msgid "Quantity"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:278
+msgid "Add to Cart"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:279
+msgid "View Product"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:289
+msgid "Categories:"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:351
+msgid "Error occurred. Please try again."
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:543
+msgid "Invalid product ID"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:551
+msgid "Product not found"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:557
+msgid "This product cannot be purchased"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:563
+msgid "This product is out of stock"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:582
+msgid "%s has been added to your cart."
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:592
+msgid "Error adding product to cart"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:623
+msgid "WooCommerce Settings"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:627
+msgid "Show Product Price"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:632
+msgid "Show Sale Badge"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:637
+msgid "Show Product Rating"
+msgstr ""
+
+#: includes/enhancements/woocommerce-integration.php:642
+msgid "Enable Add to Cart"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:23
+msgid "Animated Heading"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:41
+msgid "Content"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:49
+msgid "Heading Text"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:50
+msgid "This is an "
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:51
+msgid "Enter your heading"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:58
+msgid "Animated Text"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:59
+msgid "Amazing\nCreative\nUnique"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:60
+#: includes/widgets/class-animated-heading-widget.php:61
+msgid "Enter each word in a new line"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:68
+msgid "After Text"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:69
+msgid " heading"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:70
+msgid "Enter text after animation"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:77
+msgid "Animation Type"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:81
+msgid "Typing"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:82
+msgid "Fade"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:83
+msgid "Slide"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:84
+msgid "Zoom"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:85
+msgid "Bounce"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:93
+msgid "HTML Tag"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:113
+msgid "Animation Settings"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:121
+msgid "Typing Speed"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:135
+msgid "Back Speed"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:149
+msgid "Animation Duration"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:170
+msgid "Delay Between Words"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:190
+msgid "Show Cursor"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:192
+#: includes/widgets/class-timeline-showcase-widget.php:203
+#: includes/widgets/class-timeline-showcase-widget.php:456
+msgid "Yes"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:193
+#: includes/widgets/class-timeline-showcase-widget.php:204
+#: includes/widgets/class-timeline-showcase-widget.php:457
+msgid "No"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:202
+msgid "Cursor Character"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:216
+msgid "Style"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:224
+msgid "Heading Color"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:233
+msgid "Animated Text Color"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:242
+msgid "Cursor Color"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:265
+msgid "Alignment"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:268
+msgid "Left"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:272
+msgid "Center"
+msgstr ""
+
+#: includes/widgets/class-animated-heading-widget.php:276
+msgid "Right"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:41
+msgid "Timeline Showcase"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:69
+msgid "Content Settings"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:77
+msgid "Content Type"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:88
+msgid "Number of Items"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:99
+msgid "Category Filter"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:111
+msgid "Custom Taxonomy"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:124
+msgid "Terms"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:138
+msgid "Order By"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:142
+msgid "Date"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:143
+msgid "Title"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:144
+msgid "Menu Order"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:145
+msgid "Random"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:156
+msgid "Order"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:160
+msgid "Ascending"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:161
+msgid "Descending"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:173
+msgid "Media Settings"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:182
+msgid "Media Source"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:185
+msgid "Featured Image"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:186
+msgid "Video Thumbnail"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:187
+msgid "Custom Field"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:196
+msgid "Video URL Custom Field"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:207
+msgid "Thumbnail Size"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:217
+msgid "Enable Video Popup"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:235
+msgid "Layout Settings"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:244
+msgid "Timeline Style"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:248
+msgid "Straight Line"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:249
+msgid "Soundwave"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:250
+msgid "Custom"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:258
+msgid "Spacing Between Items"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:282
+msgid "Center Post Size"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:303
+msgid "Item Width"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:324
+msgid "Thumbnail Display Mode"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:328
+msgid "Image Only"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:329
+msgid "Image + Title"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:330
+msgid "Image + Title + Excerpt"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:339
+msgid "Enable Hover Effects"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:350
+msgid "Show Indicator Dots"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:368
+msgid "Colors & Styling"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:376
+msgid "Background Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:389
+msgid "Background"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:398
+msgid "Timeline Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:410
+msgid "Title Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:420
+msgid "Number Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:430
+msgid "Play Button Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:440
+msgid "Play Button Icon Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:450
+msgid "Navigation Button Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:460
+msgid "Navigation Border Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:470
+msgid "Indicator Dot Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:484
+msgid "Active Indicator Color"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:498
+msgid "Title Typography"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:507
+msgid "Excerpt Typography"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:519
+msgid "Number Typography"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:528
+msgid "Item Border"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:536
+msgid "Border Radius"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:555
+msgid "Item Shadow"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:567
+msgid "Animation & Effects"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:575
+msgid "Animate on Entrance"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:587
+msgid "Entrance Animation"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:590
+msgid "Fade In"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:591
+msgid "Fade In Up"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:592
+msgid "Fade In Down"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:593
+msgid "Zoom In"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:594
+msgid "Slide In Up"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:595
+msgid "Slide In Left"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:596
+msgid "Slide In Right"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:607
+msgid "Animation Duration"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:632
+msgid "Enable Thumbnail Zoom Effect"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:647
+msgid "Enable Pulse Effect on Play Button"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:665
+msgid "Interaction Settings"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:673
+msgid "Enable Drag & Scroll Navigation"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:684
+msgid "Enable Navigation Arrows"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:695
+msgid "Enable Keyboard Navigation"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:706
+msgid "Enable Mousewheel Navigation"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:717
+msgid "Item Click Action"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:721
+msgid "Open in Popup"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:722
+msgid "Go to Page"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:723
+msgid "Just Focus Item"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:732
+msgid "Enable Animated Transitions"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:743
+msgid "Transition Speed"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:770
+msgid "Advanced Settings"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:778
+msgid "Additional CSS Classes"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:779
+msgid "Class 1 class 2"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:786
+msgid "Item Aspect Ratio"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:808
+msgid "Initial Center Item"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:812
+msgid "First Item"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:813
+msgid "Middle Item"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:814
+msgid "Last Item"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:815
+msgid "Custom (Index)"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:823
+msgid "Custom Center Item Index"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:846
+msgid "Posts"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:864
+msgid "Select Taxonomy"
+msgstr ""
+
+#: includes/widgets/class-timeline-showcase-widget.php:920
+msgid "Full Size"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:291
+msgid "Emargy Elements cache has been cleared."
+msgstr ""
+
+#: vendor/emargy-cache-system.php:308
+msgid "Cache Settings"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:313
+msgid "Enable Caching"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:317
+msgid "Cache timeline queries for better performance"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:323
+msgid "Cache Duration"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:326
+msgid "seconds"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:327
+msgid "How long to keep cached data (in seconds). Default is 3600 (1 hour)."
+msgstr ""
+
+#: vendor/emargy-cache-system.php:335
+msgid "Clear Cache"
+msgstr ""
+
+#: vendor/emargy-cache-system.php:336
+msgid "If you've made changes to your content and don't see them reflected in the timeline, you can clear the cache."
+msgstr ""
+
+#: vendor/emargy-cache-system.php:338
+msgid "Clear Timeline Cache"
+msgstr ""
