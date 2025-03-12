@@ -1038,6 +1038,22 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = $this->get_settings_for_display();
         
+        // Set default values for all possible settings
+        $default_settings = [
+            'pulse_effect' => 'no',
+            'show_indicators' => 'no',
+            'enable_video_popup' => 'no',
+            'thumbnail_mode' => 'image_only',
+            'hover_effects' => 'no',
+            'navigation_arrows' => 'yes',
+            'center_post_size' => '2x',
+            'timeline_style' => 'straight',
+            // Add other settings as needed
+        ];
+        
+        // Merge defaults with actual settings
+        $settings = array_merge($default_settings, $settings);
+        
         // Prepare query arguments
         $args = [
             'post_type' => $settings['content_type'],
@@ -1047,7 +1063,7 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
         ];
 
         // Manual selection
-        if ($settings['manual_selection'] === 'yes' && !empty($settings['manual_posts'])) {
+        if (isset($settings['manual_selection']) && $settings['manual_selection'] === 'yes' && !empty($settings['manual_posts'])) {
             $args['post__in'] = $settings['manual_posts'];
             $args['orderby'] = 'post__in';
         } else {
@@ -1113,23 +1129,8 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
         $posts = $timeline_query->posts;
         $total_posts = count($posts);
         
-        // Set the initial center item index
-        switch ($settings['initial_center_item']) {
-            case 'first':
-                $center_index = 0;
-                break;
-            case 'last':
-                $center_index = $total_posts - 1;
-                break;
-            case 'custom':
-                $center_index = min($settings['custom_center_index'], $total_posts - 1);
-                $center_index = max(0, $center_index); // Ensure valid index
-                break;
-            case 'middle':
-            default:
-                $center_index = floor($total_posts / 2);
-                break;
-        }
+        // Always make the 4th item the center item
+        $center_index = 3; // 0-based index, so 4th item is index 3
         
         ?>
         <div class="<?php echo esc_attr(implode(' ', $container_classes)); ?>" 
@@ -1150,8 +1151,8 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
                         while ($timeline_query->have_posts()) : $timeline_query->the_post();
                             $item_classes = ['emargy-timeline-item'];
                             
-                            // Is this the center item?
-                            $is_center = ($counter - 1) === $center_index;
+                            // Always make the 4th item the center item
+                            $is_center = ($counter === 4);
                             if ($is_center) {
                                 $item_classes[] = 'emargy-timeline-center-item';
                             }
@@ -1207,7 +1208,7 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
                         endwhile;
                         wp_reset_postdata();
                     endif;
-                    ?>
+                ?>
                 </div>
                 
                 <div class="emargy-timeline-line <?php echo esc_attr('emargy-timeline-' . $settings['timeline_style']); ?>"></div>
@@ -1227,8 +1228,8 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
             </div>
             <?php endif; ?>
         </div>
-        
-        <?php if ($settings['pulse_effect'] === 'yes') : ?>
+            
+        <?php if (isset($settings['pulse_effect']) && $settings['pulse_effect'] === 'yes') : ?>
         <style>
             @keyframes pulse {
                 0% {
@@ -1325,7 +1326,8 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
                     <div class="{{ itemClasses.join(' ') }}">
                         <div class="emargy-timeline-item-inner">
                             <div class="emargy-timeline-thumbnail">
-                                <div class="emargy-no-thumbnail"></div>
+                                <div class="emargy-thumbnail-placeholder" style="background-color: rgba(0,0,0,0.2); width: 100%; height: 100%; position: absolute;"></div>
+                                
                                 <# if (settings.enable_video_popup === 'yes') { #>
                                 <div class="emargy-play-button">
                                     <i class="eicon-play"></i>
@@ -1349,8 +1351,6 @@ class Emargy_Timeline_Showcase_Widget extends \Elementor\Widget_Base {
                     </div>
                     <# } #>
                 </div>
-                
-                <div class="emargy-timeline-line emargy-timeline-{{ settings.timeline_style }}"></div>
             </div>
             
             <# if (settings.navigation_arrows === 'yes') { #>

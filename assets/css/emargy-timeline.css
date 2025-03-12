@@ -180,7 +180,7 @@
 }
 
 .emargy-timeline-center-item .emargy-timeline-item-inner {
-    transform: scale(2.2);
+    transform: scale(2); /* Double the size */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 

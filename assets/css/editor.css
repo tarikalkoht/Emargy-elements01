@@ -1,0 +1,13 @@
+.elementor-editor-active .emargy-timeline-thumbnail {
+    background-color: rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.elementor-editor-active .emargy-timeline-center-item {
+    transform: scale(1); /* Reset transform in editor */
+}
+
+.elementor-editor-active .emargy-timeline-item-inner {
+    border: 1px solid rgba(255,255,255,0.3);
+    background-color: rgba(0,0,0,0.2);
+}

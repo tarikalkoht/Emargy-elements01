@@ -148,6 +148,8 @@ final class Emargy_Elements {
     public function widget_styles() {
         wp_register_style('emargy-timeline-style', EMARGY_ELEMENTS_URL . 'assets/css/emargy-timeline.css', [], EMARGY_ELEMENTS_VERSION);
         wp_enqueue_style('emargy-timeline-style');
+        wp_register_style('emargy-timeline-editor-style', EMARGY_ELEMENTS_URL . 'assets/css/editor.css', [], EMARGY_ELEMENTS_VERSION);
+        wp_enqueue_style('emargy-timeline-editor-style');
     }
 
     /**

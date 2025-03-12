@@ -43,19 +43,25 @@
     function initializeTimeline($container) {
         const $items = $container.find('.emargy-timeline-items');
         const $allItems = $container.find('.emargy-timeline-item');
-        const $centerItem = $container.find('.emargy-timeline-center-item');
         const $navPrev = $container.find('.emargy-nav-prev');
         const $navNext = $container.find('.emargy-nav-next');
         const openType = $container.data('open-type');
         
-        // Create indicator dots
-        createIndicatorDots($container, $allItems);
+        // Always make the 4th item (index 3) the center item
+        const centerIndex = 3; // 0-based index, so 4th item is index 3
+        const $centerItem = $allItems.eq(centerIndex);
         
-        // Set initial position to center the center item
-        if ($centerItem.length) {
-            centerTimelineItem($items, $centerItem);
-            updateIndicators($container, $centerItem);
-        }
+        // Remove center class from all items
+        $allItems.removeClass('emargy-timeline-center-item');
+        
+        // Add center class to the 4th item
+        $centerItem.addClass('emargy-timeline-center-item');
+        
+        // Center the item
+        centerTimelineItem($items, $centerItem);
+        
+        // Update indicator dots
+        updateIndicators($container, $centerItem);
         
         // Initialize navigation
         initNavigation($container, $items, $allItems);
@@ -494,6 +500,8 @@
      * @param {string} openType How to open the post ('popup' or 'page')
      */
     function openPost(postId, openType) {
+        console.log('Opening post', postId, openType); // Debug line to check if this function is being called
+        
         if (openType === 'popup') {
             // Open in a popup (requires Elementor Pro or a custom popup implementation)
             if (typeof elementorProFrontend !== 'undefined' && 
