@@ -137,9 +137,11 @@ final class Emargy_Elements {
     public function register_widgets($widgets_manager) {
         // Include Widget files
         require_once(EMARGY_ELEMENTS_PATH . 'includes/widgets/class-timeline-showcase-widget.php');
+        require_once(EMARGY_ELEMENTS_PATH . 'includes/widgets/class-animated-heading-widget.php');
 
-        // Register the widget
+        // Register widgets
         $widgets_manager->register(new \Emargy_Timeline_Showcase_Widget());
+        $widgets_manager->register(new \Emargy_Animated_Heading_Widget());
     }
 
     /**
@@ -156,7 +158,14 @@ final class Emargy_Elements {
      * Register scripts for the frontend
      */
     public function widget_scripts() {
+        // Existing scripts
         wp_register_script('emargy-timeline-script', EMARGY_ELEMENTS_URL . 'assets/js/emargy-timeline.js', ['jquery'], EMARGY_ELEMENTS_VERSION, true);
+        
+        // New scripts for text effects
+        wp_register_script('typed-js', EMARGY_ELEMENTS_URL . 'assets/js/typed.min.js', [], '2.0.12', true);
+        wp_register_script('emargy-animated-heading', EMARGY_ELEMENTS_URL . 'assets/js/emargy-animated-heading.js', ['jquery', 'typed-js'], EMARGY_ELEMENTS_VERSION, true);
+        
+        // Enqueue timeline script
         wp_enqueue_script('emargy-timeline-script');
     }
 

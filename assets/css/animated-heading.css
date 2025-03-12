@@ -1,0 +1,79 @@
+/**
+ * Emargy Animated Heading Widget Styles
+ */
+
+ .emargy-animated-heading-wrapper {
+    overflow: hidden;
+}
+
+.emargy-animated-heading {
+    line-height: 1.2;
+    margin: 0;
+}
+
+.emargy-animated-text {
+    display: inline-block;
+    min-width: 1em;
+}
+
+/* Typing animation cursor */
+.typed-cursor {
+    opacity: 1;
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Fade animation */
+.emargy-animation-fade.emargy-animation-exit {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.emargy-animation-fade.emargy-animation-enter {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+/* Slide animation */
+.emargy-animation-slide.emargy-animation-exit {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.emargy-animation-slide.emargy-animation-enter {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Zoom animation */
+.emargy-animation-zoom.emargy-animation-exit {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.emargy-animation-zoom.emargy-animation-enter {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Bounce animation */
+.emargy-animation-bounce.emargy-animation-exit {
+    opacity: 0;
+    transform: scale(1.2);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.emargy-animation-bounce.emargy-animation-enter {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
