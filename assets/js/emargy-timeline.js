@@ -73,14 +73,14 @@
         const $navNext = $container.find('.emargy-nav-next');
         const openType = $container.data('open-type');
         
-        // Always make the 4th item (index 3) the center item
-        const centerIndex = 3; // 0-based index, so 4th item is index 3
+        // Always make the middle item the center item
+        const centerIndex = Math.floor($allItems.length / 2); // Calculate the middle index
         const $centerItem = $allItems.eq(centerIndex);
         
         // Remove center class from all items
         $allItems.removeClass('emargy-timeline-center-item');
         
-        // Add center class to the 4th item
+        // Add center class to the middle item
         $centerItem.addClass('emargy-timeline-center-item');
         
         // Center the item
