@@ -27,19 +27,19 @@ class Emargy_Enhanced_AJAX_Handler {
      */
     public function __construct() {
         // Register AJAX handlers
-        add_action('wp_ajax_emargy_get_posts', array(\$this, 'get_posts'));
-        add_action('wp_ajax_nopriv_emargy_get_posts', array(\$this, 'get_posts'));
+        add_action('wp_ajax_emargy_get_posts', array($this, 'get_posts'));
+        add_action('wp_ajax_nopriv_emargy_get_posts', array($this, 'get_posts'));
         
-        add_action('wp_ajax_emargy_get_post_content', array(\$this, 'get_post_content'));
-        add_action('wp_ajax_nopriv_emargy_get_post_content', array(\$this, 'get_post_content'));
+        add_action('wp_ajax_emargy_get_post_content', array($this, 'get_post_content'));
+        add_action('wp_ajax_nopriv_emargy_get_post_content', array($this, 'get_post_content'));
         
-        add_action('wp_ajax_emargy_get_video_info', array(\$this, 'get_video_info'));
-        add_action('wp_ajax_nopriv_emargy_get_video_info', array(\$this, 'get_video_info'));
+        add_action('wp_ajax_emargy_get_video_info', array($this, 'get_video_info'));
+        add_action('wp_ajax_nopriv_emargy_get_video_info', array($this, 'get_video_info'));
         
-        add_action('wp_ajax_emargy_get_terms', array(\$this, 'get_taxonomy_terms'));
+        add_action('wp_ajax_emargy_get_terms', array($this, 'get_taxonomy_terms'));
         
         // Setup rate limiting and security checks
-        add_action('init', array(\$this, 'setup_security'));
+        add_action('init', array($this, 'setup_security'));
     }
 
     /**
@@ -48,8 +48,8 @@ class Emargy_Enhanced_AJAX_Handler {
     public function setup_security() {
         // Only apply rate limiting on AJAX requests
         if (defined('DOING_AJAX') && DOING_AJAX) {
-            \$this->check_rate_limit();
-            \$this->check_referrer();
+            $this->check_rate_limit();
+            $this->check_referrer();
         }
     }
 
@@ -58,25 +58,25 @@ class Emargy_Enhanced_AJAX_Handler {
      */
     private function check_rate_limit() {
         // Get client IP
-        \$client_ip = \$this->get_client_ip();
+        $client_ip = $this->get_client_ip();
         
         // Initialize rate limiting
-        \$rate_key = 'emargy_rate_' . md5(\$client_ip);
-        \$rate_limit = 60; // Requests per minute
-        \$rate_window = 60; // 1 minute window
+        $rate_key = 'emargy_rate_' . md5($client_ip);
+        $rate_limit = 60; // Requests per minute
+        $rate_window = 60; // 1 minute window
         
         // Get current count and time
-        \$rate_count = get_transient(\$rate_key);
+        $rate_count = get_transient($rate_key);
         
-        if (false === \$rate_count) {
+        if (false === $rate_count) {
             // First request, set to 1
-            set_transient(\$rate_key, 1, \$rate_window);
-        } else if (\$rate_count < \$rate_limit) {
+            set_transient($rate_key, 1, $rate_window);
+        } else if ($rate_count < $rate_limit) {
             // Increment request count
-            set_transient(\$rate_key, \$rate_count + 1, \$rate_window);
+            set_transient($rate_key, $rate_count + 1, $rate_window);
         } else {
             // Too many requests
-            \$this->send_error_response('rate_limit_exceeded', 'Rate limit exceeded. Please try again later.', 429);
+            $this->send_error_response('rate_limit_exceeded', 'Rate limit exceeded. Please try again later.', 429);
         }
     }
 
@@ -90,10 +90,10 @@ class Emargy_Enhanced_AJAX_Handler {
         }
         
         // Check referrer
-        \$referrer = isset(\$_SERVER['HTTP_REFERER']) ? \$_SERVER['HTTP_REFERER'] : '';
+        $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
         
-        if (!\$referrer || parse_url(\$referrer, PHP_URL_HOST) !== parse_url(home_url(), PHP_URL_HOST)) {
-            \$this->send_error_response('invalid_referrer', 'Invalid request origin', 403);
+        if (!$referrer || parse_url($referrer, PHP_URL_HOST) !== parse_url(home_url(), PHP_URL_HOST)) {
+            $this->send_error_response('invalid_referrer', 'Invalid request origin', 403);
         }
     }
 
@@ -101,83 +101,83 @@ class Emargy_Enhanced_AJAX_Handler {
      * Get posts via AJAX
      */
     public function get_posts() {
-        \$this->verify_nonce('emargy_timeline_nonce');
+        $this->verify_nonce('emargy_timeline_nonce');
         
         // Parse request data
-        \$content_type = isset(\$_POST['content_type']) ? sanitize_text_field(\$_POST['content_type']) : 'post';
-        \$limit = isset(\$_POST['limit']) ? absint(\$_POST['limit']) : 10;
-        \$category = isset(\$_POST['category']) ? array_map('absint', (array)\$_POST['category']) : array();
-        \$orderby = isset(\$_POST['orderby']) ? sanitize_text_field(\$_POST['orderby']) : 'date';
-        \$order = isset(\$_POST['order']) ? sanitize_text_field(\$_POST['order']) : 'DESC';
-        \$taxonomy = isset(\$_POST['taxonomy']) ? sanitize_key(\$_POST['taxonomy']) : '';
-        \$terms = isset(\$_POST['terms']) ? array_map('absint', (array)\$_POST['terms']) : array();
+        $content_type = isset($_POST['content_type']) ? sanitize_text_field($_POST['content_type']) : 'post';
+        $limit = isset($_POST['limit']) ? absint($_POST['limit']) : 10;
+        $category = isset($_POST['category']) ? array_map('absint', (array)$_POST['category']) : array();
+        $orderby = isset($_POST['orderby']) ? sanitize_text_field($_POST['orderby']) : 'date';
+        $order = isset($_POST['order']) ? sanitize_text_field($_POST['order']) : 'DESC';
+        $taxonomy = isset($_POST['taxonomy']) ? sanitize_key($_POST['taxonomy']) : '';
+        $terms = isset($_POST['terms']) ? array_map('absint', (array)$_POST['terms']) : array();
         
         // Build query args
-        \$args = array(
-            'post_type' => \$content_type,
-            'posts_per_page' => \$limit,
-            'orderby' => \$orderby,
-            'order' => \$order,
+        $args = array(
+            'post_type' => $content_type,
+            'posts_per_page' => $limit,
+            'orderby' => $orderby,
+            'order' => $order,
             'post_status' => 'publish',
         );
         
         // Category filter for posts
-        if (\$content_type === 'post' && !empty(\$category)) {
-            \$args['tax_query'] = array(
+        if ($content_type === 'post' && !empty($category)) {
+            $args['tax_query'] = array(
                 array(
                     'taxonomy' => 'category',
                     'field' => 'term_id',
-                    'terms' => \$category,
+                    'terms' => $category,
                 )
             );
         }
         
         // Custom taxonomy filter
-        if (!empty(\$taxonomy) && !empty(\$terms)) {
-            \$args['tax_query'] = array(
+        if (!empty($taxonomy) && !empty($terms)) {
+            $args['tax_query'] = array(
                 array(
-                    'taxonomy' => \$taxonomy,
+                    'taxonomy' => $taxonomy,
                     'field' => 'term_id',
-                    'terms' => \$terms,
+                    'terms' => $terms,
                 )
             );
         }
         
         // Get posts with caching if available
         if (function_exists('emargy_get_cached_query')) {
-            \$query = emargy_get_cached_query(\$args, 'ajax_timeline');
+            $query = emargy_get_cached_query($args, 'ajax_timeline');
         } else {
-            \$query = new WP_Query(\$args);
+            $query = new WP_Query($args);
         }
         
         // Prepare response data
-        \$posts_data = array();
+        $posts_data = array();
         
-        if (\$query->have_posts()) {
-            while (\$query->have_posts()) {
-                \$query->the_post();
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
                 
                 // Get thumbnail URL
-                \$thumbnail_url = '';
+                $thumbnail_url = '';
                 if (has_post_thumbnail()) {
-                    \$thumbnail_url = get_the_post_thumbnail_url(get_the_ID(), 'medium');
+                    $thumbnail_url = get_the_post_thumbnail_url(get_the_ID(), 'medium');
                 }
                 
                 // Get video URL if available
-                \$video_url = '';
-                \$video_field = isset(\$_POST['video_field']) ? sanitize_text_field(\$_POST['video_field']) : 'video_url';
-                if (\$video_field) {
-                    \$video_url = get_post_meta(get_the_ID(), \$video_field, true);
+                $video_url = '';
+                $video_field = isset($_POST['video_field']) ? sanitize_text_field($_POST['video_field']) : 'video_url';
+                if ($video_field) {
+                    $video_url = get_post_meta(get_the_ID(), $video_field, true);
                 }
                 
                 // Build post data
-                \$posts_data[] = array(
+                $posts_data[] = array(
                     'id' => get_the_ID(),
                     'title' => get_the_title(),
                     'excerpt' => wp_trim_words(get_the_excerpt(), 15),
                     'permalink' => get_permalink(),
-                    'thumbnail_url' => \$thumbnail_url,
-                    'video_url' => \$video_url,
+                    'thumbnail_url' => $thumbnail_url,
+                    'video_url' => $video_url,
                     'date' => get_the_date(),
                 );
             }
@@ -186,32 +186,32 @@ class Emargy_Enhanced_AJAX_Handler {
         
         // Send response
         wp_send_json_success(array(
-            'posts' => \$posts_data,
-            'found_posts' => \$query->found_posts,
-            'max_num_pages' => \$query->max_num_pages,
+            'posts' => $posts_data,
+            'found_posts' => $query->found_posts,
+            'max_num_pages' => $query->max_num_pages,
         ));
     }
 
     /**
      * Helper methods
      */
-    private function verify_nonce(\$action) {
-        if (!check_ajax_referer(\$action, 'nonce', false)) {
-            \$this->send_error_response('invalid_nonce', 'Security check failed.', 403);
+    private function verify_nonce($action) {
+        if (!check_ajax_referer($action, 'nonce', false)) {
+            $this->send_error_response('invalid_nonce', 'Security check failed.', 403);
         }
     }
     
-    private function send_error_response(\$code, \$message, \$status = 400) {
-        status_header(\$status);
+    private function send_error_response($code, $message, $status = 400) {
+        status_header($status);
         wp_send_json_error(array(
-            'code' => \$code,
-            'message' => \$message
+            'code' => $code,
+            'message' => $message
         ));
         exit;
     }
     
     private function get_client_ip() {
-        \$ip_keys = array(
+        $ip_keys = array(
             'HTTP_CLIENT_IP',
             'HTTP_X_FORWARDED_FOR',
             'HTTP_X_FORWARDED',
@@ -221,9 +221,9 @@ class Emargy_Enhanced_AJAX_Handler {
             'REMOTE_ADDR'
         );
         
-        foreach (\$ip_keys as \$key) {
-            if (isset(\$_SERVER[\$key]) && filter_var(\$_SERVER[\$key], FILTER_VALIDATE_IP)) {
-                return \$_SERVER[\$key];
+        foreach ($ip_keys as $key) {
+            if (isset($_SERVER[$key]) && filter_var($_SERVER[$key], FILTER_VALIDATE_IP)) {
+                return $_SERVER[$key];
             }
         }
         
