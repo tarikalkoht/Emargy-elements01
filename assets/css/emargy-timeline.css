@@ -1,0 +1,329 @@
+/**
+ * Emargy Timeline Showcase Widget Styles
+ */
+
+/* Main Container */
+.emargy-timeline-container {
+    position: relative;
+    width: 100%;
+    padding: 40px 0;
+    overflow: hidden;
+    background-color: #e22d4b;
+}
+
+/* Items Wrapper */
+.emargy-timeline-items-wrapper {
+    position: relative;
+    margin: 0 auto;
+    width: 90%;
+    overflow: hidden;
+}
+
+/* Timeline Items */
+.emargy-timeline-items {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    min-height: 220px;
+    transition: transform 0.5s ease;
+}
+
+/* Individual Timeline Item */
+.emargy-timeline-item {
+    position: relative;
+    min-width: 100px;
+    margin-right: 20px;
+    z-index: 2;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.emargy-timeline-item-inner {
+    position: relative;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* Timeline Item Thumbnail */
+.emargy-timeline-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
+}
+
+.emargy-timeline-thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.emargy-no-thumbnail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Play Button */
+.emargy-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.emargy-play-button i {
+    color: #fff;
+    font-size: 14px;
+}
+
+/* Timeline Content */
+.emargy-timeline-content {
+    padding: 10px;
+    color: #fff;
+}
+
+.emargy-timeline-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.emargy-timeline-excerpt {
+    font-size: 12px;
+    margin-top: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Timeline Number */
+.emargy-timeline-number {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* Center Item Styles */
+.emargy-timeline-center-item {
+    z-index: 3;
+}
+
+.emargy-timeline-center-item .emargy-timeline-item-inner {
+    transform: scale(2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.emargy-timeline-center-item .emargy-play-button {
+    width: 60px;
+    height: 60px;
+}
+
+.emargy-timeline-center-item .emargy-play-button i {
+    font-size: 20px;
+}
+
+.emargy-timeline-center-item .emargy-timeline-title {
+    font-size: 16px;
+}
+
+/* Hover Effects */
+.emargy-hover-enabled .emargy-timeline-item:hover .emargy-timeline-item-inner {
+    transform: translateY(-10px);
+}
+
+.emargy-hover-enabled .emargy-timeline-center-item:hover .emargy-timeline-item-inner {
+    transform: scale(2) translateY(-5px);
+}
+
+.emargy-hover-enabled .emargy-timeline-item:hover .emargy-play-button {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Timeline Line */
+.emargy-timeline-line {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+    z-index: 1;
+}
+
+/* Soundwave Style */
+.emargy-timeline-wave {
+    height: 20px;
+    background: repeating-linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.2),
+        rgba(255, 255, 255, 0.2) 2px,
+        transparent 2px,
+        transparent 5px
+    );
+    background-color: transparent;
+    position: relative;
+}
+
+.emargy-timeline-wave:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+    transform: translateY(-50%);
+}
+
+/* Special soundwave display for the items */
+.emargy-timeline-style-wave .emargy-timeline-items {
+    margin-bottom: 30px;
+}
+
+.emargy-timeline-style-wave .emargy-timeline-item:nth-child(odd) {
+    margin-top: -20px;
+}
+
+.emargy-timeline-style-wave .emargy-timeline-item:nth-child(even) {
+    margin-top: 20px;
+}
+
+.emargy-timeline-style-wave .emargy-timeline-center-item {
+    margin-top: 0 !important;
+}
+
+/* Navigation Arrows */
+.emargy-timeline-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.emargy-timeline-nav:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.emargy-nav-prev {
+    left: 20px;
+}
+
+.emargy-nav-next {
+    right: 20px;
+}
+
+.emargy-timeline-nav i {
+    color: #fff;
+    font-size: 20px;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 1024px) {
+    .emargy-timeline-center-item .emargy-timeline-item-inner {
+        transform: scale(1.5);
+    }
+    
+    .emargy-hover-enabled .emargy-timeline-center-item:hover .emargy-timeline-item-inner {
+        transform: scale(1.5) translateY(-5px);
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .emargy-timeline-center-item .emargy-timeline-item-inner {
+        transform: scale(1.2);
+    }
+    
+    .emargy-hover-enabled .emargy-timeline-center-item:hover .emargy-timeline-item-inner {
+        transform: scale(1.2) translateY(-5px);
+    }
+    
+    .emargy-timeline-item {
+        min-width: 80px;
+    }
+    
+    .emargy-timeline-nav {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .emargy-timeline-nav i {
+        font-size: 16px;
+    }
+    
+    .emargy-nav-prev {
+        left: 10px;
+    }
+    
+    .emargy-nav-next {
+        right: 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .emargy-timeline-items-wrapper {
+        width: 85%;
+    }
+    
+    .emargy-timeline-center-item .emargy-timeline-item-inner {
+        transform: scale(1.1);
+    }
+    
+    .emargy-hover-enabled .emargy-timeline-center-item:hover .emargy-timeline-item-inner {
+        transform: scale(1.1) translateY(-5px);
+    }
+    
+    .emargy-timeline-item {
+        min-width: 70px;
+        margin-right: 15px;
+    }
+    
+    .emargy-timeline-title {
+        font-size: 12px;
+    }
+    
+    .emargy-timeline-center-item .emargy-timeline-title {
+        font-size: 14px;
+    }
+    
+    .emargy-timeline-number {
+        font-size: 12px;
+    }
+}

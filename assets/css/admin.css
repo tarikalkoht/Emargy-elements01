@@ -1,0 +1,40 @@
+/**
+ * Emargy Elements Admin Styles
+ */
+
+/* Elementor Widget Icon */
+.elementor-element .icon .eicon-time-line {
+    color: #e22d4b;
+}
+
+.elementor-panel .elementor-element:hover .icon .eicon-time-line {
+    color: #fff;
+}
+
+.elementor-panel .elementor-element:hover .elementor-element-title-wrapper .title,
+.elementor-panel .elementor-element:hover .icon {
+    color: #e22d4b;
+}
+
+/* Admin Notice */
+.emargy-admin-notice {
+    background-color: #fff;
+    border-left-color: #e22d4b;
+    padding: 15px;
+}
+
+.emargy-admin-notice h2 {
+    margin-top: 0;
+    color: #e22d4b;
+}
+
+.emargy-admin-notice .button-primary {
+    background-color: #e22d4b;
+    border-color: #c42742;
+}
+
+.emargy-admin-notice .button-primary:hover,
+.emargy-admin-notice .button-primary:focus {
+    background-color: #c42742;
+    border-color: #a32238;
+}
